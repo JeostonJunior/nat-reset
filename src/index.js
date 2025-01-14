@@ -51,7 +51,7 @@ async function resetUser(botKey, versionKey, userPhone) {
   };
 
   try {
-    const response = await axios.get(fullURL, { headers });
+    const response = await axios.delete(fullURL, { headers });
     if (response.status === 204) {
       console.log("Request was successful. No content returned.");
     } else {
@@ -65,5 +65,35 @@ async function resetUser(botKey, versionKey, userPhone) {
   }
 }
 
-// Call the function with parameters for `draft` of `nat_latam`
-resetUser('nat_latam', 'draft', "557199225783");
+// // Call the function with parameters for `draft` of `nat_latam`
+// resetUser('nat_latam', 'live', "51979799636");
+
+document.getElementById('loginForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    const response = await fetch('/auth/loginValidation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Credenciais inválidas');
+    }
+
+    const { token } = await response.json();
+
+    // Salva o token no localStorage
+    localStorage.setItem('authToken', token);
+
+    // Redireciona para a rota protegida
+    window.location.href = '/protected/home';
+  } catch (error) {
+    console.error('Erro durante o login:', error);
+    alert('Erro ao fazer login. Verifique suas credenciais.');
+  }
+});
