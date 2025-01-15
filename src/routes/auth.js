@@ -13,25 +13,25 @@ const users = [
   },
 ];
 
-// Login e geração de token
 router.post('/loginValidation', (req, res) => {
   const { email, password } = req.body;
+  console.log('validation');
 
+  // Verifica se o usuário existe
   const user = users.find((u) => u.email === email && u.password === password);
   if (!user) {
     return res.status(401).json({ error: 'Credenciais inválidas' });
   }
 
+  // Gera o token JWT
   const token = jwt.sign(
     { id: user.id, email: user.email },
     process.env.JWT_SECRET,
-    { expiresIn: '1h' },
+    { expiresIn: '1h' }
   );
 
-  // Redirecionar o usuário com o token no cabeçalho ou cookie
-  res.cookie('authToken', token, { httpOnly: true });
-  res.redirect('/protected/home');
+  // Retorna o token ao cliente
+  res.json({ token });
 });
-
 
 export default router;
